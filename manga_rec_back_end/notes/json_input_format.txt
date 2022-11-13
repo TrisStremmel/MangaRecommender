@@ -1,0 +1,12 @@
+[Popularity(min,max),
+Release Date(min,max),
+Chapter Count(min,max),
+Status(true=Exclude, len=4),
+Genre(true=include, len=18),
+Theme(true=include, len=51),
+Demographic(true=include, len=5),
+Genre(true=exclude, len=18),
+Theme(true=exclude, len=51),
+Demographic(true=exclude, len=5)]
+
+each filter type is an array. 

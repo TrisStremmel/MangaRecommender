@@ -1,0 +1,17 @@
+popularity min,max values:
+(1, 27691)
+releaseDate min,max values:
+(1946, 2022)
+chapterCount min,max values:
+(1, 6477)
+status values:
+['On Hiatus', 'Finished', 'Publishing', 'Discontinued']
+genre values:
+{'Adventure', 'Comedy', 'Slice of Life', 'Boys Love', 'Sci-Fi', 'Action', 'Horror', 'Suspense', 'Girls Love', 'Gourmet', 'Sports', 'Avant Garde', 'Supernatural', 'Fantasy', 'Romance', 'Ecchi', 'Drama', 'Mystery'}
+genre count: 18
+theme values:
+{'Historical', 'Time Travel', 'Visual Arts', 'Military', 'Love Polygon', 'Mecha', 'Martial Arts', 'Racing', 'Samurai', 'Strategy Game', 'CGDCT', 'Mythology', 'High Stakes Game', 'Idols (Male)', 'Reincarnation', 'Pets', 'Team Sports', 'Workplace', 'Isekai', 'Gag Humor', 'Memoir', 'Harem', 'Villainess', 'Detective', 'Performing Arts', 'Reverse Harem', 'Childcare', 'Otaku Culture', 'Mahou Shoujo', 'Anthropomorphic', 'Survival', 'Magical Sex Shift', 'Music', 'Delinquents', 'Organized Crime', 'Adult Cast', 'Medical', 'Showbiz', 'Crossdressing', 'Gore', 'Psychological', 'School', 'Combat Sports', 'Parody', 'Romantic Subtext', 'Space', 'Iyashikei', 'Video Game', 'Educational', 'Vampire', 'Super Power'}
+theme count: 51
+demographic values:
+{'Kids', 'Seinen', 'Shoujo', 'Josei', 'Shounen'}
+demographic count: 5
