@@ -1,0 +1,16 @@
+.idea/
+anime_results/
+manga_pages/
+manga_pages_old/
+manga_results/
+venv/
+ResNet152V2_Hierarchical/
+image_saved_data/
+manga_images/
+
+node_modules
+/.pnp
+.pnp.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

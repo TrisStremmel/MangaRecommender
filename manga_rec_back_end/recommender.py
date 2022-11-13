@@ -816,7 +816,7 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
 
 
 callFromNode = False
-runExperiment = False
+runExperiment = True
 includeAll = [[1, 27691], [1946, 2022], [1, 6477],
               [False] * 4, [False] * 18, [False] * 51, [False] * 5, [False] * 18, [False] * 51, [False] * 5]
 noAdventure = "[[1, 27691],[1946, 2022],[1, 6477],[false,false,false,false],[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false],[true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false]]"
@@ -835,7 +835,7 @@ else:
     start_time = time.time()
     #print(recommend(17441, json.loads(noAdventure)))  # me
     # test with uid1, uid2, uid3, uid2768, uid10, uid17441
-    print(recommend(17441, includeAll))
+    #print(recommend(17441, includeAll))
 
     if runExperiment:
         all_precisions, all_recalls, all_diversities, userResultSets = [], [], [], []
@@ -852,11 +852,11 @@ else:
         print(userIdSet)
         tempCursor.close()
         userIdRange = '{}-{}'.format(min(userIdSet), max(userIdSet))
-        hyperparameters = '1_1_1_1 ResNet152V2Avg_100HierarchicalClusters ResNet152V2Avg matrixK=36 k=65 KNN 32'
+        hyperparameters = '0.5_0.5_1_1 ResNet152V2Avg_100HierarchicalClusters ResNet152V2Avg matrixK=36 k=65 KNN 32'
         for n in userIdSet:
             print('UserID:', n)
             precision, recall, diversity, mangaIDs = recommend(n, includeAll, showResultsFromEachMethod=False, loadMangaFromLocal=True, useLocalRatings=True,
-                methodWeights=[1,1,0.5,0.5], clusterAlgName='ResNet152V2Avg_100HierarchicalClusters',
+                methodWeights=[0.5,0.5,1,1], clusterAlgName='ResNet152V2Avg_100HierarchicalClusters',
                 imageFeatureSetName='ResNet152V2Avg', matrixK=36, k=65, runLSH=False, numLSHPermutations=32)
             all_precisions.append(precision)
             all_recalls.append(recall)
