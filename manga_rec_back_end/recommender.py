@@ -484,7 +484,7 @@ def get_manga_id(manga_index, imagesMap):
     # convert manga_index (node names in the extracted_features array and clusters) to manga_id (from database)
     return int(imagesMap[manga_index][:-4])
 
-def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFromLocal=True, forceTestSize=True, methodWeights=None, numMangaToRecommend=50,
+def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFromLocal=True, forceTestSize=True, methodWeights=None, numMangaToReturn=50,
               k=65, runLSH=False, useLSH=False, runPackageLSHCode=False, numLSHPermutations=32, useLocalRatings=True,
               clusterAlgName='ResNet152V2Avg_100HierarchicalClusters', imageFeatureSetName='ResNet152V2Avg', matrixK=38):
     if methodWeights is None:  # this if statement works in place of default value
@@ -746,7 +746,7 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
         similarUsersMangaScores[[i[0] for i in similarUsersMangaScores].index(recommendations[x][0])][1],
         mangaImageClusterScores[[i[0] for i in mangaImageClusterScores].index(recommendations[x][0])][1],
         mangaImageMatrixScores[[i[0] for i in mangaImageMatrixScores].index(recommendations[x][0])][1])
-                     + "\t" + str(recommendations[x]) for x in range(5)]))  # HELPFUL
+                     + "\t" + str(recommendations[x]) for x in range(numMangaToReturn)]))  # HELPFUL
     # print('\n'.join([str(filteredMangaScores[
     #                                      [i[0] for i in filteredMangaScores].index(recommendations[x][0])][
     #                                      1]) + "\t" + str(recommendations[x]) for x in range(50)]))  # HELPFUL
@@ -762,7 +762,7 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
     # return list of json with manga info for the highest scored recommendations
     if callFromNode:
         results = []
-        for x in recommendations[:numMangaToRecommend]:
+        for x in recommendations[:numMangaToReturn]:
             results.append({"id": x[0], "title": x[2], "pictureLink": x[9]})
         return json.dumps(results)
     else:
@@ -782,7 +782,7 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
                 precision_at_ks.append(truePositives/k)
                 recall_at_ks.append(truePositives/numRelevantItems)
 
-            recommendedIds = [x[0] for x in recommendations[:numMangaToRecommend]]
+            recommendedIds = [x[0] for x in recommendations[:numMangaToReturn]]
             totalDistances = []
             #mangaDistanceMatrix = pairwise_distances(mangaEncoded)
             for i in range(len(recommendedIds)-1):
@@ -812,11 +812,12 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
             # plt.close()
             print('evaluation took,', time.time()-evalTime)
             return precision_at_ks, recall_at_ks, diversityValue, recommendedIds
-        return recommendations[:numMangaToRecommend]
+        return recommendations[:numMangaToReturn]
 
 
 callFromNode = False
-runExperiment = True
+runExperiment = False
+runMultipleExperiments = True
 includeAll = [[1, 27691], [1946, 2022], [1, 6477],
               [False] * 4, [False] * 18, [False] * 51, [False] * 5, [False] * 18, [False] * 51, [False] * 5]
 noAdventure = "[[1, 27691],[1946, 2022],[1, 6477],[false,false,false,false],[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false],[true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false]]"
@@ -835,7 +836,8 @@ else:
     start_time = time.time()
     #print(recommend(17441, json.loads(noAdventure)))  # me
     # test with uid1, uid2, uid3, uid2768, uid10, uid17441
-    #print(recommend(17441, includeAll))
+    if not runExperiment and not runMultipleExperiments:
+        print(recommend(17441, includeAll))
 
     if runExperiment:
         all_precisions, all_recalls, all_diversities, userResultSets = [], [], [], []
@@ -925,5 +927,114 @@ else:
         print('count', count, 'overlap', overlapTotal)
         f.write('\nPersonalization Score (average overlap of recommendation result set between users): {}'.format(overlapTotal/count))
         f.close()
+
+        if runMultipleExperiments and not runExperiment:
+            hyperparameterConfigurations = [20,38,76,100]
+            #hyperparameter for matrixK
+            for hyperparameterConfig in hyperparameterConfigurations:
+                all_precisions, all_recalls, all_diversities, userResultSets = [], [], [], []
+                db = mysql.connector.connect(
+                    host="washington.uww.edu",
+                    user="stremmeltr18",
+                    passwd=base64.b64decode(b'dHM1NjEy').decode("utf-8"),
+                    database="manga_rec"
+                )
+                tempCursor = db.cursor()
+                # tempCursor.execute("select id from users LIMIT 2")
+                tempCursor.execute(
+                    "select userId from users where userId not in (select userId from ratings group by userId having count(*) < 20) limit 50;")
+                userIdSet = [x[0] for x in tempCursor.fetchall()]
+                print(userIdSet)
+                tempCursor.close()
+                userIdRange = '{}-{}'.format(min(userIdSet), max(userIdSet))
+                hyperparameters = '1_2_1_1 ResNet152V2Avg_100HierarchicalClusters ResNet152V2Avg matrixK={} k=65 KNN 32'.format(hyperparameterConfig)
+                for n in userIdSet:
+                    print('UserID:', n)
+                    precision, recall, diversity, mangaIDs = recommend(n, includeAll, showResultsFromEachMethod=False,
+                                                                       loadMangaFromLocal=True, useLocalRatings=True,
+                                                                       methodWeights=[1, 2, 1, 1],
+                                                                       clusterAlgName='ResNet152V2Avg_100HierarchicalClusters',
+                                                                       imageFeatureSetName='ResNet152V2Avg', matrixK=hyperparameterConfig,
+                                                                       k=65, runLSH=False, numLSHPermutations=32)
+                    all_precisions.append(precision)
+                    all_recalls.append(recall)
+                    all_diversities.append(diversity)
+                    userResultSets.append(mangaIDs)
+
+                if not os.path.exists('recommendation_results/{}'.format(hyperparameters)):
+                    os.mkdir('recommendation_results/{}'.format(hyperparameters))
+                np.save(
+                    'recommendation_results/{}/precision for userIds in range {}'.format(hyperparameters, userIdRange),
+                    all_precisions)
+                np.save('recommendation_results/{}/recall for userIds in range {}'.format(hyperparameters, userIdRange),
+                        all_recalls)
+                np.save('recommendation_results/{}/recommendations result set for userIds in range {}'.format(
+                    hyperparameters, userIdRange), userResultSets)
+                kValues = range(1, 51)  ################make sure to match to ks array in recommend function
+                finalFig, axis1 = plt.subplots()
+                axis2 = axis1.twinx()
+
+                axis1.plot(kValues, np.mean(all_precisions, axis=0), 'g-')
+                axis2.plot(kValues, np.mean(all_recalls, axis=0), 'b-')
+                axis1.set_ylim([0, 1])
+                axis2.set_ylim([0, 1])
+
+                axis1.set_xlabel('K values')
+                axis1.set_ylabel('precision', color='g')
+                axis2.set_ylabel('recall', color='b')
+                plt.title('average precision and recall for userIds in range {}'.format(userIdRange))
+
+                plt.savefig('recommendation_results/{}/average for userIds in range {}.png'.format(hyperparameters,
+                                                                                                   userIdRange),
+                            bbox_inches='tight')
+                plt.show()
+                plt.close()
+
+                plt.scatter(userIdSet, all_diversities)
+                plt.xlabel('user id')
+                plt.ylabel('diversity')
+                plt.title('diversity for userIds in range {}'.format(userIdRange))
+                plt.savefig('recommendation_results/{}/diversity for userIds in range {}.png'.format(hyperparameters,
+                                                                                                     userIdRange),
+                            bbox_inches='tight')
+                plt.show()
+                plt.close()
+
+                plt.hist(all_diversities)
+                plt.xlabel('diversity values')
+                plt.title('diversity for userIds in range {}'.format(userIdRange))
+                plt.savefig(
+                    'recommendation_results/{}/diversity histogram for userIds in range {}.png'.format(hyperparameters,
+                                                                                                       userIdRange),
+                    bbox_inches='tight')
+                plt.show()
+                plt.close()
+
+                plt.boxplot(all_diversities)
+                plt.ylabel('diversity values')
+                plt.title('diversity for userIds in range {}'.format(userIdRange))
+                plt.savefig(
+                    'recommendation_results/{}/diversity histogram for userIds in range {}.png'.format(hyperparameters,
+                                                                                                       userIdRange),
+                    bbox_inches='tight')
+                plt.show()
+                plt.close()
+
+                f = open('recommendation_results/{}/diversity and overlap for userIds in range {}.txt'.format(
+                    hyperparameters, userIdRange), 'w')
+                f.write('Average Diversity: {}'.format(np.mean(np.array(all_diversities))))
+
+                overlapTotal = 0
+                count = 0
+                for n in range(len(userResultSets) - 1):
+                    for m in range(n + 1, len(userResultSets)):
+                        overlapTotal += len(list(set(userResultSets[n]) & set(userResultSets[m])))
+                        count += 1
+                print('count', count, 'overlap', overlapTotal)
+                f.write(
+                    '\nPersonalization Score (average overlap of recommendation result set between users): {}'.format(
+                        overlapTotal / count))
+                f.close()
+
     print("total run time:", time.time() - start_time)
     # print(recommend(1, testFilter))
