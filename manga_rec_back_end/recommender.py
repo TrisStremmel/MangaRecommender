@@ -854,7 +854,7 @@ else:
         print(userIdSet)
         tempCursor.close()
         userIdRange = '{}-{}'.format(min(userIdSet), max(userIdSet))
-        hyperparameters = '02_01_01_01 ResNet152V2Avg_100HierarchicalClusters ResNet152V2Avg matrixK=36 k=65 KNN 32'
+        hyperparameters = '2_1_1_1 ResNet152V2Avg_100HierarchicalClusters ResNet152V2Avg matrixK=36 k=65 KNN 32'
         for n in userIdSet:
             print('UserID:', n)
             precision, recall, diversity, mangaIDs = recommend(n, includeAll, showResultsFromEachMethod=False, loadMangaFromLocal=True, useLocalRatings=True,
@@ -929,8 +929,8 @@ else:
         f.close()
 
         if runMultipleExperiments and not runExperiment:
-            hyperparameterConfigurations = [20,38,76,100]
-            #hyperparameter for matrixK
+            hyperparameterConfigurations = [32,65,130]
+            #hyperparameter for k
             for hyperparameterConfig in hyperparameterConfigurations:
                 all_precisions, all_recalls, all_diversities, userResultSets = [], [], [], []
                 db = mysql.connector.connect(
@@ -947,7 +947,7 @@ else:
                 print(userIdSet)
                 tempCursor.close()
                 userIdRange = '{}-{}'.format(min(userIdSet), max(userIdSet))
-                hyperparameters = '01_02_.5_.5 ResNet152V2Avg_100HierarchicalClusters ResNet152V2Avg matrixK=36 k={} KNN 32'.format(hyperparameterConfig)
+                hyperparameters = '1_2_0.5_0.5 ResNet152V2Avg_100HierarchicalClusters ResNet152V2Avg matrixK=36 k={} KNN 32'.format(hyperparameterConfig)
                 for n in userIdSet:
                     print('UserID:', n)
                     precision, recall, diversity, mangaIDs = recommend(n, includeAll, showResultsFromEachMethod=False,
