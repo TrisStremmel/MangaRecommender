@@ -852,11 +852,11 @@ else:
         print(userIdSet)
         tempCursor.close()
         userIdRange = '{}-{}'.format(min(userIdSet), max(userIdSet))
-        hyperparameters = '0.5_0.5_1_1 ResNet152V2Avg_100HierarchicalClusters ResNet152V2Avg matrixK=36 k=65 KNN 32'
+        hyperparameters = '2_1_1_1 ResNet152V2Avg_100HierarchicalClusters ResNet152V2Avg matrixK=36 k=65 KNN 32'
         for n in userIdSet:
             print('UserID:', n)
             precision, recall, diversity, mangaIDs = recommend(n, includeAll, showResultsFromEachMethod=False, loadMangaFromLocal=True, useLocalRatings=True,
-                methodWeights=[0.5,0.5,1,1], clusterAlgName='ResNet152V2Avg_100HierarchicalClusters',
+                methodWeights=[2,1,1,1], clusterAlgName='ResNet152V2Avg_100HierarchicalClusters',
                 imageFeatureSetName='ResNet152V2Avg', matrixK=36, k=65, runLSH=False, numLSHPermutations=32)
             all_precisions.append(precision)
             all_recalls.append(recall)

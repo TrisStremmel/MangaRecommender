@@ -89,7 +89,7 @@ app.post('/api/user/mal-cold-start/', function(req,res){
     console.log("Getting user of", req.body.username, "with userID of", req.body.userId);
     // res.send(req.body.username);
 
-    const python = spawn('H:/manga_rec/manga_rec_front_end/mangaRecommender/venv/Scripts/python', ['mangaRecommender/addUser.py', req.body.username, req.body.userId]);
+    const python = spawn('C:/Users/Tris/Desktop/MangaRecommender/manga_rec_front_end/mangaRecommender/venv/Scripts/python', ['mangaRecommender/addUser.py', req.body.username, req.body.userId]);
 
     python.stdout.on('data', function (data) {
         dataToSend = data;
@@ -177,7 +177,7 @@ app.post('/api/manga/recommend', function(req,res){
     let dataToSend;
 	const command = "conda run -n for_manga_rec python mangaRecommender/recommender.py"
 
-    const python = spawn('H:/manga_rec/manga_rec_front_end/mangaRecommender/venv/Scripts/python', ['mangaRecommender/recommender.py', req.body.userId, req.body.filters]);
+    const python = spawn('C:/Users/Tris/Desktop/MangaRecommender/manga_rec_front_end/mangaRecommender/venv/Scripts/python', ['mangaRecommender/recommender.py', req.body.userId, req.body.filters]);
     //const python = spawn('C:\Users\Tris Stremmel\anaconda3\envs\for_manga_rec\python', ['mangaRecommender/HelloWorld.py', "1"]);
 
     python.stdout.on('data', function (data) {
