@@ -816,7 +816,7 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
 
 
 callFromNode = False
-runExperiment = False
+runExperiment = True
 runMultipleExperiments = True
 includeAll = [[1, 27691], [1946, 2022], [1, 6477],
               [False] * 4, [False] * 18, [False] * 51, [False] * 5, [False] * 18, [False] * 51, [False] * 5]
@@ -839,7 +839,7 @@ else:
     if not runExperiment and not runMultipleExperiments:
         print(recommend(17441, includeAll))
 
-    if runExperiment:
+    if runExperiment and not runMultipleExperiments:
         all_precisions, all_recalls, all_diversities, userResultSets = [], [], [], []
         db = mysql.connector.connect(
             host="washington.uww.edu",
@@ -928,7 +928,7 @@ else:
         f.write('\nPersonalization Score (average overlap of recommendation result set between users): {}'.format(overlapTotal/count))
         f.close()
 
-    if runMultipleExperiments and not runExperiment:
+    if runMultipleExperiments:
         print("hi")
         hyperparameterConfigurations = [20,38,76,100]
         #hyperparameter for k
