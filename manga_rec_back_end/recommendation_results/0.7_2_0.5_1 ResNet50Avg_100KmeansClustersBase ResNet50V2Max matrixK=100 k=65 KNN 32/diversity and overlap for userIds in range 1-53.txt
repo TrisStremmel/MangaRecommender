@@ -1,0 +1,2 @@
+Average Diversity: 0.5261325437289018
+Personalization Score (average overlap of recommendation result set between users): 6.184489795918368
