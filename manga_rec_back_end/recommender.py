@@ -885,7 +885,7 @@ else:
         plt.title('average precision and recall for userIds in range {}'.format(userIdRange))
 
         plt.savefig('recommendation_results/{}/average for userIds in range {}.png'.format(hyperparameters, userIdRange), bbox_inches='tight')
-        plt.show()
+        #plt.show()
         plt.close()
 
         plt.scatter(userIdSet, all_diversities)
@@ -893,7 +893,7 @@ else:
         plt.ylabel('diversity')
         plt.title('diversity for userIds in range {}'.format(userIdRange))
         plt.savefig('recommendation_results/{}/diversity for userIds in range {}.png'.format(hyperparameters, userIdRange), bbox_inches='tight')
-        plt.show()
+        #plt.show()
         plt.close()
 
         plt.hist(all_diversities)
@@ -902,7 +902,7 @@ else:
         plt.savefig(
             'recommendation_results/{}/diversity histogram for userIds in range {}.png'.format(hyperparameters, userIdRange),
             bbox_inches='tight')
-        plt.show()
+        #plt.show()
         plt.close()
 
         plt.boxplot(all_diversities)
@@ -912,7 +912,7 @@ else:
             'recommendation_results/{}/diversity histogram for userIds in range {}.png'.format(hyperparameters,
                                                                                                userIdRange),
             bbox_inches='tight')
-        plt.show()
+        #plt.show()
         plt.close()
 
         f = open('recommendation_results/{}/diversity and overlap for userIds in range {}.txt'.format(hyperparameters, userIdRange), 'w')
@@ -988,7 +988,7 @@ else:
             plt.savefig('recommendation_results/{}/average for userIds in range {}.png'.format(hyperparameters,
                                                                                                userIdRange),
                         bbox_inches='tight')
-            plt.show()
+            #plt.show()
             plt.close()
 
             plt.scatter(userIdSet, all_diversities)
@@ -998,7 +998,7 @@ else:
             plt.savefig('recommendation_results/{}/diversity for userIds in range {}.png'.format(hyperparameters,
                                                                                                  userIdRange),
                         bbox_inches='tight')
-            plt.show()
+            #plt.show()
             plt.close()
 
             plt.hist(all_diversities)
@@ -1008,7 +1008,7 @@ else:
                 'recommendation_results/{}/diversity histogram for userIds in range {}.png'.format(hyperparameters,
                                                                                                    userIdRange),
                 bbox_inches='tight')
-            plt.show()
+            #plt.show()
             plt.close()
 
             plt.boxplot(all_diversities)
@@ -1018,7 +1018,7 @@ else:
                 'recommendation_results/{}/diversity histogram for userIds in range {}.png'.format(hyperparameters,
                                                                                                    userIdRange),
                 bbox_inches='tight')
-            plt.show()
+            #plt.show()
             plt.close()
 
             f = open('recommendation_results/{}/diversity and overlap for userIds in range {}.txt'.format(
