@@ -746,7 +746,7 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
         similarUsersMangaScores[[i[0] for i in similarUsersMangaScores].index(recommendations[x][0])][1],
         mangaImageClusterScores[[i[0] for i in mangaImageClusterScores].index(recommendations[x][0])][1],
         mangaImageMatrixScores[[i[0] for i in mangaImageMatrixScores].index(recommendations[x][0])][1])
-                     + "\t" + str(recommendations[x]) for x in range(numMangaToReturn)]))  # HELPFUL
+                     + "\t" + str(recommendations[x]) for x in range(5)]))  # HELPFUL
     # print('\n'.join([str(filteredMangaScores[
     #                                      [i[0] for i in filteredMangaScores].index(recommendations[x][0])][
     #                                      1]) + "\t" + str(recommendations[x]) for x in range(50)]))  # HELPFUL
@@ -929,7 +929,7 @@ else:
         f.close()
 
     if runMultipleExperiments:
-        hyperparameterConfigurations = [32,65,130]
+        hyperparameterConfigurations = [20,38,76,100]
         #hyperparameter for k
         for hyperparameterConfig in hyperparameterConfigurations:
             print("hyperparameterConfig", hyperparameterConfig)
@@ -948,15 +948,16 @@ else:
             print(userIdSet)
             tempCursor.close()
             userIdRange = '{}-{}'.format(min(userIdSet), max(userIdSet))
-            hyperparameters = '1_2_0.5_0.5 ResNet152V2Avg_100HierarchicalClusters ResNet152V2Avg matrixK=36 k={} KNN 32'.format(hyperparameterConfig)
+            hyperparameters = '0.5_1_0.5_1 ResNet50Avg_100KmeansClustersBase ResNet50V2Max matrixK={} k=65 KNN 32'.format(hyperparameterConfig)
             for n in userIdSet:
                 print('UserID:', n)
                 precision, recall, diversity, mangaIDs = recommend(n, includeAll, showResultsFromEachMethod=False,
                                                                    loadMangaFromLocal=True, useLocalRatings=True,
-                                                                   methodWeights=[1, 2, 0.5, 0.5],
-                                                                   clusterAlgName='ResNet152V2Avg_100HierarchicalClusters',
-                                                                   imageFeatureSetName='ResNet152V2Avg', matrixK=36,
-                                                                   k=hyperparameterConfig, runLSH=False, numLSHPermutations=32)
+                                                                   methodWeights=[0.5, 1, 0.5, 1],
+                                                                   clusterAlgName='ResNet50Avg_100KmeansClustersBase',
+                                                                   imageFeatureSetName='ResNet50V2Max', matrixK=hyperparameterConfig,
+                                                                   k=65, runLSH=False, useLSH=False, runPackageLSHCode=True,
+                                                                   numLSHPermutations=32)
                 all_precisions.append(precision)
                 all_recalls.append(recall)
                 all_diversities.append(diversity)
