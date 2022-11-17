@@ -746,7 +746,7 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
         similarUsersMangaScores[[i[0] for i in similarUsersMangaScores].index(recommendations[x][0])][1],
         mangaImageClusterScores[[i[0] for i in mangaImageClusterScores].index(recommendations[x][0])][1],
         mangaImageMatrixScores[[i[0] for i in mangaImageMatrixScores].index(recommendations[x][0])][1])
-                     + "\t" + str(recommendations[x]) for x in range(numMangaToReturn)]))  # HELPFUL
+                     + "\t" + str(recommendations[x]) for x in range(5)]))  # HELPFUL
     # print('\n'.join([str(filteredMangaScores[
     #                                      [i[0] for i in filteredMangaScores].index(recommendations[x][0])][
     #                                      1]) + "\t" + str(recommendations[x]) for x in range(50)]))  # HELPFUL
@@ -783,17 +783,17 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
                 recall_at_ks.append(truePositives/numRelevantItems)
 
             recommendedIds = [x[0] for x in recommendations[:numMangaToReturn]]
-            totalDistances = []
+            similarities = []
             #mangaDistanceMatrix = pairwise_distances(mangaEncoded)
             for i in range(len(recommendedIds)-1):
-                distances = []
+                similarity = []
                 for j in range(i+1, len(recommendedIds)):
-                    distances.append(cosineSimilarity(mangaEncoded[get_manga_array_index[recommendedIds[i]]][1:],
-                                                      mangaEncoded[get_manga_array_index[recommendedIds[j]]][1:]))
+                    similarity.append(cosineSimilarity(mangaEncoded[get_manga_array_index[recommendedIds[i]]][1:],
+                                                       mangaEncoded[get_manga_array_index[recommendedIds[j]]][1:]))
                     #distances.append(mangaDistanceMatrix[get_manga_array_index[recommendedIds[i]]][get_manga_array_index[recommendedIds[j]]])
-                totalDistances.append(np.mean(np.array(distances)))
-            print(totalDistances)
-            diversityValue = 1-np.mean(np.array(totalDistances))
+                similarities.append(np.mean(np.array(similarity)))
+            print(similarities)
+            diversityValue = 1-np.mean(np.array(similarities))
             print('Diversity:', diversityValue)
             # fig, ax1 = plt.subplots()
             # ax2 = ax1.twinx()
@@ -837,7 +837,7 @@ else:
     #print(recommend(17441, json.loads(noAdventure)))  # me
     # test with uid1, uid2, uid3, uid2768, uid10, uid17441
     if not runExperiment and not runMultipleExperiments:
-        print(recommend(17441, includeAll))
+        print(recommend(17441, includeAll, runLSH=True, useLSH=True, runPackageLSHCode=True))
 
     if runExperiment and not runMultipleExperiments:
         all_precisions, all_recalls, all_diversities, userResultSets = [], [], [], []
@@ -929,7 +929,7 @@ else:
         f.close()
 
     if runMultipleExperiments:
-        hyperparameterConfigurations = [32,65,130]
+        hyperparameterConfigurations = [16,32,65,130]
         #hyperparameter for k
         for hyperparameterConfig in hyperparameterConfigurations:
             print("hyperparameterConfig", hyperparameterConfig)
@@ -948,15 +948,16 @@ else:
             print(userIdSet)
             tempCursor.close()
             userIdRange = '{}-{}'.format(min(userIdSet), max(userIdSet))
-            hyperparameters = '1_2_0.5_0.5 ResNet152V2Avg_100HierarchicalClusters ResNet152V2Avg matrixK=36 k={} KNN 32'.format(hyperparameterConfig)
+            hyperparameters = '0.5_2_0.7_0.7 ResNet50V2Avg_100HierarchicalClusters ResNet50V2Max matrixK=36 k=65 LSH {}'.format(hyperparameterConfig)
             for n in userIdSet:
                 print('UserID:', n)
                 precision, recall, diversity, mangaIDs = recommend(n, includeAll, showResultsFromEachMethod=False,
                                                                    loadMangaFromLocal=True, useLocalRatings=True,
-                                                                   methodWeights=[1, 2, 0.5, 0.5],
-                                                                   clusterAlgName='ResNet152V2Avg_100HierarchicalClusters',
-                                                                   imageFeatureSetName='ResNet152V2Avg', matrixK=36,
-                                                                   k=hyperparameterConfig, runLSH=False, numLSHPermutations=32)
+                                                                   methodWeights=[0.5, 2, 0.7, 0.7],
+                                                                   clusterAlgName='ResNet50V2Avg_100HierarchicalClusters',
+                                                                   imageFeatureSetName='ResNet50V2Max', matrixK=36,
+                                                                   k=hyperparameterConfig, runLSH=False, useLSH=False, runPackageLSHCode=True,
+                                                                   numLSHPermutations=32)
                 all_precisions.append(precision)
                 all_recalls.append(recall)
                 all_diversities.append(diversity)
