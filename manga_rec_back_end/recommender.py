@@ -929,7 +929,7 @@ else:
         f.close()
 
     if runMultipleExperiments:
-        hyperparameterConfigurations = [16,32,65,130]
+        hyperparameterConfigurations = [20,38,76,100]
         #hyperparameter for k
         for hyperparameterConfig in hyperparameterConfigurations:
             print("hyperparameterConfig", hyperparameterConfig)
@@ -948,15 +948,15 @@ else:
             print(userIdSet)
             tempCursor.close()
             userIdRange = '{}-{}'.format(min(userIdSet), max(userIdSet))
-            hyperparameters = '0.5_2_0.7_0.7 ResNet50V2Avg_100HierarchicalClusters ResNet50V2Max matrixK=36 k=65 LSH {}'.format(hyperparameterConfig)
+            hyperparameters = '0.5_1_0.5_1 ResNet50Avg_100KmeansClustersBase ResNet50V2Max matrixK={} k=65 KNN 32'.format(hyperparameterConfig)
             for n in userIdSet:
                 print('UserID:', n)
                 precision, recall, diversity, mangaIDs = recommend(n, includeAll, showResultsFromEachMethod=False,
                                                                    loadMangaFromLocal=True, useLocalRatings=True,
-                                                                   methodWeights=[0.5, 2, 0.7, 0.7],
-                                                                   clusterAlgName='ResNet50V2Avg_100HierarchicalClusters',
-                                                                   imageFeatureSetName='ResNet50V2Max', matrixK=36,
-                                                                   k=hyperparameterConfig, runLSH=False, useLSH=False, runPackageLSHCode=True,
+                                                                   methodWeights=[0.5, 1, 0.5, 1],
+                                                                   clusterAlgName='ResNet50Avg_100KmeansClustersBase',
+                                                                   imageFeatureSetName='ResNet50V2Max', matrixK=hyperparameterConfig,
+                                                                   k=65, runLSH=False, useLSH=False, runPackageLSHCode=True,
                                                                    numLSHPermutations=32)
                 all_precisions.append(precision)
                 all_recalls.append(recall)
