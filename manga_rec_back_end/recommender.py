@@ -488,15 +488,17 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
               k=65, runLSH=False, useLSH=False, runPackageLSHCode=False, numLSHPermutations=32, useLocalRatings=True,
               clusterAlgName='ResNet152V2Avg_100HierarchicalClusters', imageFeatureSetName='ResNet152V2Avg', matrixK=38):
     if methodWeights is None:  # this if statement works in place of default value
-        methodWeights = [1, 2, .7, .7]
+        methodWeights = [.7, 2, .7, .7]
 
-    dataBase = mysql.connector.connect(
-        host="washington.uww.edu",
-        user="stremmeltr18",
-        passwd=base64.b64decode(b'dHM1NjEy').decode("utf-8"),
-        database="manga_rec"
-    )
-    myCursor = dataBase.cursor()
+    dataBase, myCursor = None, None
+    if loadMangaFromLocal or useLocalRatings:
+        dataBase = mysql.connector.connect(
+            host="washington.uww.edu",
+            user="stremmeltr18",
+            passwd=base64.b64decode(b'dHM1NjEy').decode("utf-8"),
+            database="manga_rec"
+        )
+        myCursor = dataBase.cursor()
 
     # create one hot encoded (and other data alterations) matrix of manga table
     # possible include no_genres/no_themes column (i dont think it would be good but idk)
@@ -535,9 +537,16 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
     print('excludedIds', excludedIds)
 
     # get user's manga ratings
-    myCursor.execute("select * from ratings where userId = %s;", [userId])
-    ratings = [x for x in myCursor]
-    convertedRatings = [convertRating(x) for x in ratings]
+    convertedRatings = []
+    if useLocalRatings:
+        all_user_ratings = np.load('convertedRatings.npy', allow_pickle=True)
+        for i in range(len(all_user_ratings)):
+            if all_user_ratings[i][0] == userId:
+                convertedRatings.append((all_user_ratings[i][1], all_user_ratings[i][2]))
+    else:
+        myCursor.execute("select * from ratings where userId = %s;", [userId])
+        ratings = [x for x in myCursor]
+        convertedRatings = [convertRating(x) for x in ratings]
     #print('\n'.join([str(x) for x in convertedRatings]))
 
     testSet = []  #only includes manga ids because we only include manga that should be recommended
@@ -816,8 +825,8 @@ def recommend(userId: int, filters, showResultsFromEachMethod=False, loadMangaFr
 
 
 callFromNode = False
-runExperiment = True
-runMultipleExperiments = True
+runExperiment = False
+runMultipleExperiments = False
 includeAll = [[1, 27691], [1946, 2022], [1, 6477],
               [False] * 4, [False] * 18, [False] * 51, [False] * 5, [False] * 18, [False] * 51, [False] * 5]
 noAdventure = "[[1, 27691],[1946, 2022],[1, 6477],[false,false,false,false],[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false],[true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false]]"
@@ -837,7 +846,7 @@ else:
     #print(recommend(17441, json.loads(noAdventure)))  # me
     # test with uid1, uid2, uid3, uid2768, uid10, uid17441
     if not runExperiment and not runMultipleExperiments:
-        print(recommend(17441, includeAll, runLSH=True, useLSH=True, runPackageLSHCode=True))
+        print(recommend(17441, includeAll, loadMangaFromLocal=True, useLocalRatings=True))
 
     if runExperiment and not runMultipleExperiments:
         all_precisions, all_recalls, all_diversities, userResultSets = [], [], [], []
